@@ -1,11 +1,15 @@
 <template>
   <div class="todo-contaiiner">
-    <h2>自定义事件传值【适合于子组件向父组件回传数据】,这里改造的是 Head </h2>
+    <h2>作用域插槽,这里改造的是 Foot </h2>
     <div class="todo-wrap">
 
       <Head ref="head" />
       <List :todoL="todos" :deleteTodo="deleteTodo" />
-      <Foot :todosfoot="todos" :selectedAll="selectedAll" :deltetAll="deltetAll" />
+      <Foot>
+        <input slot="isCheck" type="checkbox" v-model="isCheck">
+        <span slot="finish">已完成{{finsihedCount}}件/ 总计{{todos.length}}件</span>
+        <button slot="delete" class="btn btn-waring" @click="deltetAll">清除已完成的任务</button>
+      </Foot>
     </div>
   </div>
 </template>
@@ -23,6 +27,20 @@ export default {
   data () {
     return {
       todos: localStorageUtils.readTodos()
+    }
+  },
+  computed: {
+    finsihedCount () {
+      return this.todos.reduce((total, todo) => total + (todo.finished ? 1 : 0), 0)
+    },
+    // 是否选中
+    isCheck: {
+      get () {
+        return this.finsihedCount === this.todos.length && this.todos.length > 0
+      },
+      set (value) {
+        this.selectedAll(value)
+      }
     }
   },
   components: {
